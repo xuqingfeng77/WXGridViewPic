@@ -13,8 +13,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -24,13 +22,19 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.example.administrator.wxgridviewpic.R.mipmap.ic_launcher;
 
-
+/**
+ * xuqingfeng
+ */
 public class MainActivity extends ActionBarActivity {
+    String TAG="xqf_demo";
 
     private GridView gridView1;              //网格显示缩略图
     private Button buttonPublish;            //发布按钮
@@ -153,7 +157,20 @@ public class MainActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         if(!TextUtils.isEmpty(pathImage)){
-            Bitmap addbmp=BitmapFactory.decodeFile(pathImage);
+//            Bitmap addbmp=BitmapFactory.decodeFile(pathImage);
+            Bitmap  addbmp = null;
+            try {
+                addbmp = PhotoProcess.getPhoto(null, pathImage, 2);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (addbmp != null && !addbmp.isRecycled()) {
+                    addbmp.recycle();
+                }
+                addbmp = null;
+//                MyToast.showToast(RegAct.this, "获取图片异常，请重新获取图片");
+                Toast.makeText(MainActivity.this,"获取图片异常，请重新获取图片",Toast.LENGTH_LONG);
+                return;
+            }
             HashMap<String, Object> map = new HashMap<String, Object>();
             map.put("itemImage", addbmp);
             imageItem.add(map);
@@ -204,5 +221,55 @@ public class MainActivity extends ActionBarActivity {
         });
         builder.create().show();
     }
+    /**
+     * 获取小图片，减少内存消耗
+     *
+     * @param path
+     *            图片路径
+     * @param picsize
+     *            宽的大小 bitmap大小
+     * @return
+     */
+    private Bitmap decodeFile(String path, int picsize) {
+        Log.i(TAG,"decodeFile path=" + path);
+        if (TextUtils.isEmpty(path)) {
 
+            return null;
+        }
+        try {
+            // decode image size
+            File f = new File(path);
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(new FileInputStream(f), null, o);
+
+            // Find the correct scale value. It should be the power of 2.
+            final int REQUIRED_SIZE = picsize;// 如果是 传给服务器的，就大一点
+            int width_tmp = o.outWidth, height_tmp = o.outHeight;
+            int scale = 1;
+            while (true) {
+                if (width_tmp > height_tmp) {
+                    width_tmp = height_tmp;
+                }
+                if (width_tmp / 2 < REQUIRED_SIZE)
+                    break;
+                width_tmp /= 2;
+                height_tmp /= 2;
+                scale *= 2;
+            }
+            // decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inJustDecodeBounds = false;
+            o2.inSampleSize = scale;
+            o2.inInputShareable = true;
+            o2.inPurgeable = true;
+            Log.i(TAG,"decodeFile scale=" + scale);
+            Bitmap bm = BitmapFactory.decodeStream(new FileInputStream(f),
+                    null, o2);
+
+            return bm;
+        } catch (FileNotFoundException e) {
+        }
+        return null;
+    }
 }
