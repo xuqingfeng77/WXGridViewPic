@@ -269,6 +269,7 @@ public class MainActivity extends ActionBarActivity {
 
             return bm;
         } catch (FileNotFoundException e) {
+
         }
         return null;
     }
