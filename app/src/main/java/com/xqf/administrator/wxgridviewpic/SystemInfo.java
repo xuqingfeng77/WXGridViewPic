@@ -1,4 +1,4 @@
-package com.example.administrator.wxgridviewpic;
+package com.xqf.administrator.wxgridviewpic;
 
 import android.content.Context;
 

@@ -1,4 +1,4 @@
-package com.example.administrator.wxgridviewpic;
+package com.xqf.administrator.wxgridviewpic;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -22,16 +22,19 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import com.xqf.administrator.wxgridviewpic.PhotoProcess;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static com.example.administrator.wxgridviewpic.R.mipmap.ic_launcher;
+import static com.xqf.administrator.wxgridviewpic.R.mipmap.add_pic;
 
 /**
  * xuqingfeng
+ * 添加本地图片，增加图片回收机制，减少内存消耗
  */
 public class MainActivity extends ActionBarActivity {
     String TAG="xqf_demo";
@@ -67,7 +70,7 @@ public class MainActivity extends ActionBarActivity {
          * SimpleAdapter参数imageItem为数据源 R.layout.griditem_addpic为布局
          */
         //获取资源图片加号
-        bmp = BitmapFactory.decodeResource(getResources(), ic_launcher);
+        bmp = BitmapFactory.decodeResource(getResources(), add_pic);
         imageItem = new ArrayList<HashMap<String, Object>>();
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("itemImage", bmp);
@@ -106,10 +109,10 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id)
             {
-                if( imageItem.size() == 10) { //第一张为默认图片
+                if( (imageItem.size()-1==position)&&imageItem.size() == 10) { //最后张为默认图片
                     Toast.makeText(MainActivity.this, "图片数9张已满", Toast.LENGTH_SHORT).show();
                 }
-                else if(position == 0) { //点击图片位置为+ 0对应0张图片
+                else if(imageItem.size()-1==position) { //点击图片位置最后一张图片
                     Toast.makeText(MainActivity.this, "添加图片", Toast.LENGTH_SHORT).show();
                     //选择图片
                     Intent intent = new Intent(Intent.ACTION_PICK,
@@ -173,7 +176,8 @@ public class MainActivity extends ActionBarActivity {
             }
             HashMap<String, Object> map = new HashMap<String, Object>();
             map.put("itemImage", addbmp);
-            imageItem.add(map);
+            int size=imageItem.size();
+            imageItem.add(size-1,map);
             simpleAdapter = new SimpleAdapter(this,
                     imageItem, R.layout.griditem_addpic,
                     new String[] { "itemImage"}, new int[] { R.id.imageView1});
@@ -209,6 +213,12 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
+
+                Bitmap btm=(Bitmap)imageItem.get(position).get("itemImage");
+                 if(btm!=null&&!btm.isRecycled())
+                 {
+                     btm.recycle();
+                 }
                 imageItem.remove(position);
                 simpleAdapter.notifyDataSetChanged();
             }

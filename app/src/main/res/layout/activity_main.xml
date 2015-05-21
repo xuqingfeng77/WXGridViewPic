@@ -84,7 +84,7 @@
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="(友情提示:只能添加9张图片,长按图片可以删除已添加图片)"
+                android:text="(友情提示:只能添加9张图片,再次点击图片可以删除已添加图片)"
                 android:gravity="center" />
         </LinearLayout>
     </RelativeLayout>
