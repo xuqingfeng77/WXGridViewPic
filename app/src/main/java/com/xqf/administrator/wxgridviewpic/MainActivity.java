@@ -22,7 +22,7 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
-import com.xqf.administrator.wxgridviewpic.PhotoProcess;
+import com.xqf.administrator.wxgridviewpic.utils.PhotoProcess;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package com.xqf.administrator.wxgridviewpic;
+package com.xqf.administrator.wxgridviewpic.utils;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
